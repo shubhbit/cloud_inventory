@@ -36,7 +36,8 @@ class CloudInventory(object):
                 break
         if not free_vm:
             print("No VMs available at the minute, please try after sometime!")
-        self._dump_data()
+        else:
+            self._dump_data()
 
     def checkin_a_vm(self):
         """
