@@ -19,24 +19,20 @@ class CloudInventory(object):
         :return: None
         """
         self.data = self._load_data()
-        free_vm = None
         if self._get_vm_assigned_to_me():
             print("only one VM can be assigned to a user, you have already one VM assigned!")
             return
-        for vm_name, attrs in self.data.items():
-            if attrs["vm_state"] == "available":
-                free_vm = {vm_name: attrs}
-                print("Following Virtual machine is assigned to you:\n")
-                for vm_name in free_vm.keys():
-                    print("Name: {0}".format(vm_name))
-                    for attr, val in free_vm[vm_name].items():
-                        print("{0}: {1}".format(attr, val))
-                self.data[vm_name]["vm_state"] = "un-available"
-                self.data[vm_name]["assigned_to"] = self.user
-                break
+        free_vm = self._get_available_vm()
         if not free_vm:
             print("No VMs available at the minute, please try after sometime!")
         else:
+            print("Following Virtual machine is assigned to you:\n")
+            for vm_name in free_vm.keys():
+                print("Name: {0}".format(vm_name))
+                for attr, val in free_vm[vm_name].items():
+                    print("{0}: {1}".format(attr, val))
+            self.data[vm_name]["vm_state"] = "un-available"
+            self.data[vm_name]["assigned_to"] = self.user
             self._dump_data()
 
     def checkin_a_vm(self):
@@ -110,6 +106,16 @@ class CloudInventory(object):
         for vm_name in self.data:
             if self.user == self.data[vm_name]["assigned_to"]:
                 return vm_name
+
+    def _get_available_vm(self):
+        """
+        internal method to get an available vm from inventory
+        :return: available vm
+        """
+        for vm_name, attrs in self.data.items():
+            if attrs["vm_state"] == "available":
+                free_vm = {vm_name: attrs}
+                return free_vm
 
 
 if __name__ == "__main__":
