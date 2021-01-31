@@ -4,11 +4,20 @@ import os, json
 class CloudInventory(object):
 
     def __init__(self, name):
+        """
+        constructor method
+        :param name: name of the user
+        :return None
+        """
         self.user = name
         self.vms_list = "vms_list.json"
         self.data = None
 
     def checkout_a_vm(self):
+        """
+        method to checkout a vm
+        :return: None
+        """
         self.data = self._load_data()
         free_vm = None
         if self._get_vm_assigned_to_me():
@@ -25,12 +34,6 @@ class CloudInventory(object):
                 self.data[vm_name]["vm_state"] = "un-available"
                 self.data[vm_name]["assigned_to"] = self.user
                 break
-        # if free_vm:
-        #     print("Following Virtual machine is assigned to you:\n")
-        #     for vm_name in free_vm.keys():
-        #         print("Name: {0}".format(vm_name))
-        #         for attr, val in free_vm[vm_name].items():
-        #             print("{0}: {1}".format(attr, val))
         if not free_vm:
             print("No VMs available at the minute, please try after sometime!")
         self._dump_data()
@@ -52,12 +55,22 @@ class CloudInventory(object):
             print("No Vm is assigned to you at the moment!")
 
     def display_all_inventory_vms(self):
+        """
+        display list of VMs with their state in inventory
+        :return:
+        """
         self.data = self._load_data()
         print("Available VMs: ")
         for vm_name in self.data:
             print("VM {0} assigned to {1}".format(vm_name, self.data[vm_name]["assigned_to"]))
 
     def _cleanup(self, vm):
+        """
+        internal method to cleanup the used VM
+        :param vm: vm name to be cleaned up
+        :return: None
+        """
+        # this code is commented as there is no real VM to which ssk connection can be made
         # host = self.data[vm]["ip"]
         # port = 22
         # username = "demo"
@@ -72,22 +85,36 @@ class CloudInventory(object):
 
 
     def _load_data(self):
+        """
+        internal method to load data locally from json file
+        :return: loaded data
+        """
         with open(self.vms_list) as json_file:
             data = json.load(json_file)
         return data
 
     def _dump_data(self):
+        """
+        internal method to dump data into a json file
+        :return: None
+        """
         with open(self.vms_list, 'w') as json_file:
             json.dump(self.data, json_file)
 
-
     def _get_vm_assigned_to_me(self):
+        """
+        internal method to get vm assigned to a particular user
+        :return: vm name
+        """
         for vm_name in self.data:
             if self.user == self.data[vm_name]["assigned_to"]:
                 return vm_name
 
 
 if __name__ == "__main__":
+    """
+    Driver code
+    """
     name = input("Enter your name: ")
     user = CloudInventory(name)
     user_input = True
